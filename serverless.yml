@@ -1,0 +1,54 @@
+service: trial-docker
+
+frameworkVersion: '3'
+
+custom:
+  labroleArn: arn:aws:iam::${aws:accountId}:role/Administrator 
+  
+provider:
+  name: aws
+  runtime: python3.9
+  ecr:
+    # In this section you can define images that will be built locally and uploaded to ECR
+    images:
+      get-books-itbooks:
+        path: lambda/get-books-itbooks/
+      get-books-nytimes:
+        path: lambda/get-books-nytimes/
+      insert-book:
+        path: lambda/insert-book/
+
+functions:
+  get-books-itbooks:
+    # handler: lambda/get_books_itbooks.handler
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      DYNAMO_TABLE: "Le table"
+    image:
+      name: get-books-itbooks
+
+  get-books-nytimes:
+    # handler: lambda/get_books_nytimes.handler
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      DYNAMO_TABLE: "Le table"
+    image:
+      name: get-books-nytimes
+
+  insert-book:
+    # handler: lambda/get_books_nytimes.handler
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      DYNAMO_TABLE: "Le table"
+    image:
+      name: insert-book
+
+resources:
+  Resources:
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: authors-and-books
