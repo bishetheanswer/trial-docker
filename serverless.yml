@@ -17,6 +17,8 @@ provider:
         path: lambda/get-books-nytimes/
       insert-book:
         path: lambda/insert-book/
+      update-table:
+        path: lambda/update-table/
 
 functions:
   get-books-itbooks:
@@ -45,6 +47,15 @@ functions:
       DYNAMO_TABLE: "Le table"
     image:
       name: insert-book
+  
+  update-table:
+    # handler: lambda/get_books_nytimes.handler
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      DYNAMO_TABLE: "Le table"
+    image:
+      name: update-table
 
 resources:
   Resources:

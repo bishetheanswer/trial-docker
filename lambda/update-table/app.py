@@ -2,7 +2,7 @@ import json
 
 
 def handler(event, context):
-    print(event)
+    print("Updating tableeee")
     body = {
         "message": "Inserting book to DYNAMODB",
         "input": event,
