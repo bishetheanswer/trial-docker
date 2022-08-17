@@ -23,9 +23,10 @@ provider:
 functions:
   get-books-itbooks:
     # handler: lambda/get_books_itbooks.handler
+    timeout: 30
     role: ${self:custom.labroleArn}
     environment:
-      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
       DYNAMO_TABLE: "Le table"
     image:
       name: get-books-itbooks
@@ -34,8 +35,9 @@ functions:
     # handler: lambda/get_books_nytimes.handler
     role: ${self:custom.labroleArn}
     environment:
-      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
-      DYNAMO_TABLE: "Le table"
+      S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
+      DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
+      SSM_PARAM: /nytimes/api/key
     image:
       name: get-books-nytimes
 
@@ -44,7 +46,7 @@ functions:
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
-      DYNAMO_TABLE: "Le table"
+      DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
     image:
       name: insert-book
   
@@ -53,7 +55,7 @@ functions:
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
-      DYNAMO_TABLE: "Le table"
+      DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
     image:
       name: update-table
 
@@ -63,3 +65,59 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: authors-and-books
+
+    DynamoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: authors
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: isbn13
+            AttributeType: S
+          - AttributeName: author
+            AttributeType: S
+        KeySchema: 
+          - KeyType: HASH
+            AttributeName: isbn13
+          - KeyType: RANGE
+            AttributeName: author
+        
+          
+        
+        
+        
+#           - AttributeName: name
+#             AttributeType: S
+#         KeySchema:
+#           - AttributeName: name
+#             KeyType: HASH
+#             AttributeName: "isbn13"
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+
+
+#           {
+#   "TableName": "authors",
+#   "KeySchema": [
+#     {
+#       "KeyType": "HASH",
+#       "AttributeName": "isbn13"
+#     },
+#     {
+#       "KeyType": "RANGE",
+#       "AttributeName": "author"
+#     }
+#   ],
+#   "AttributeDefinitions": [
+#     {
+#       "AttributeName": "isbn13",
+#       "AttributeType": "S"
+#     },
+#     {
+#       "AttributeName": "author",
+#       "AttributeType": "S"
+#     }
+#   ],
+#   "BillingMode": "PAY_PER_REQUEST"
+# }
