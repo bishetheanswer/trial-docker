@@ -56,3 +56,4 @@ def get_hash(key):
     # Download file
     # Calculate hash
     # Delete file from local storage
+    pass
