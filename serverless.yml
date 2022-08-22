@@ -11,6 +11,8 @@ provider:
   ecr:
     # In this section you can define images that will be built locally and uploaded to ECR
     images:
+      get-books-biblioteca-nacional:
+        path: lambda/get-books-biblioteca-nacional/
       get-books-itbooks:
         path: lambda/get-books-itbooks/
       get-books-nytimes:
@@ -21,6 +23,16 @@ provider:
         path: lambda/update-table/
 
 functions:
+  get-books-biblioteca-nacional:
+    # handler: lambda/get_books_itbooks.handler
+    timeout: 900
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
+      DYNAMO_TABLE: "Le table"
+    image:
+      name: get-books-biblioteca-nacional
+
   get-books-itbooks:
     # handler: lambda/get_books_itbooks.handler
     timeout: 30
