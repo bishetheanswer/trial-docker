@@ -36,7 +36,11 @@ def insert_itbooks(books):
 
 def insert_nytimes(books):
     print('These are books from the NYTIMES API')
-
+    for book in books:
+        book_details = extract_details(book)
+        print('Uploading: ', book_details["title"])
+        upload_nytimes_to_dynamo(book_details)
+        print('Uploaded!!!: ', book_details["title"])
 
 def extract_details(key):
     s3 = boto3.client("s3")
@@ -59,6 +63,22 @@ def upload_itbook_to_dynamo(book_details):
             "year": {"N": book_details["year"]},
             "isbn10": {"S": book_details["isbn10"]},
             "isbn13": {"S": book_details["isbn13"]},
+            "pages": {"N": int(book_details["pages"])},
+            "rating": {"N": float(book_details["rating"])}
+        },
+    )
+
+def upload_nytimes_to_dynamo(book_details):
+    dynamo_client = boto3.client("dynamodb")
+    dynamo_client.put_item(
+        TableName=DYNAMO_TABLE,
+        Item={
+            "author": {"S": book_details["author_name"]},
+            "title": {"S": book_details["title"]},
+            "publisher": {"S": book_details["publisher"]},
+            "price": {"N": book_details["price"]},
+            "isbn10": {"S": book_details["primary_isbn10"]},
+            "isbn13": {"S": book_details["primary_isbn13"]},
         },
     )
 
