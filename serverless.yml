@@ -57,7 +57,7 @@ functions:
     # handler: lambda/get_books_nytimes.handler
     role: ${self:custom.labroleArn}
     environment:
-      S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
+      S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName}
       DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
     image:
       name: insert-book
