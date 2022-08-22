@@ -29,7 +29,7 @@ functions:
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
-      DYNAMO_TABLE: "Le table"
+      DYNAMO_TABLE: "${self:resources.Resources.DynamoTable.Properties.TableName}"
     image:
       name: get-books-biblioteca-nacional
 
@@ -39,7 +39,7 @@ functions:
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
-      DYNAMO_TABLE: "Le table"
+      DYNAMO_TABLE: "${self:resources.Resources.DynamoTable.Properties.TableName}"
     image:
       name: get-books-itbooks
 
