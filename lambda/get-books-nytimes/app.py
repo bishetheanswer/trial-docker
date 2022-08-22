@@ -4,6 +4,8 @@ from faker import Faker
 import requests
 from datetime import datetime
 import boto3
+import unicodedata
+import logging
 
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
@@ -47,6 +49,7 @@ def handler(event, context):
     new_books = [book for book in books if not exists_in_mongo(book)]
     for book in new_books:
         key = upload_to_s3(book)
+        print('Uploaded', book)
         all_new_keys.append(key)
 
     return all_new_keys
@@ -60,13 +63,43 @@ def extract_books(response):
 
 
 def exists_in_mongo(book):
-    return False  # TODO
+    dynamo_client = boto3.client('dynamodb', region_name='us-east-1')
+
+    isbn13 = book['primary_isbn13']
+    condition = 'isbn13 = :isbn13'
+    attributes = {':isbn13': {'S': isbn13}}
+    response = dynamo_client.query(TableName=DYNAMO_TABLE, KeyConditionExpression=condition, ExpressionAttributeValues=attributes)
+    matching_books = response.get('Items', [])
+    if len(matching_books) != 0:
+        logging.info(f"Book {book['title']} already existst!")
+        print('Books already exists!')
+        return True
+    
+    # # TODO: usar un query en vez de un scan, para eso hay que hace que isbn13 sea primary key o como se llame
+    # response = dynamo_client.scan(TableName=DYNAMO_TABLE, IndexName='isbn13', FilterExpression=condition, ExpressionAttributeValues=attributes)
+    # matching_books = response.get('Items', [])
+    # if len(matching_books) != 0:
+    #     logging.info(f"Book {book['title']} already existst!")
+    #     return True
+    return False
 
 
 def upload_to_s3(book):
     s3 = boto3.client("s3")
-    author = book["author"]
+    author = normalize_name(book["author"])
     isbn13 = book["primary_isbn13"]
     key = f"clean/{author}/{isbn13}.json"
     s3.put_object(Body=json.dumps(book), Bucket=S3_BUCKET, Key=key)
     return key
+
+
+def strip_accents(s):
+    # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-normalize-in-a-python-unicode-string
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
+
+
+def normalize_name(s):
+    s = s.replace(".", "").replace(" ","_").lower() # el formato suele ser nombre apellido o nombre inicial. apellido
+    s = strip_accents(s)
+    return s
