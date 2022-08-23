@@ -17,6 +17,9 @@ def handler(event, context):
     elif source == 'nytimes-api':
         print('NY')
         insert_nytimes(books)
+    elif source == 'biblioteca':
+        print("biblioteca")
+        insert_bilbioteca(books)
     print('NONE')
     # print(event)
 
@@ -40,6 +43,21 @@ def insert_nytimes(books):
         book_details = extract_details(book)
         print('Uploading: ', book_details["title"])
         upload_nytimes_to_dynamo(book_details)
+        print('Uploaded!!!: ', book_details["title"])
+
+def insert_biblioteca(books):
+    print('These are books from the BIBLIOTECA')
+    batch = []
+    for book in books:
+        book_details = extract_details(book)
+        batch.append(book_details)
+        if len(batch) == 20:
+            upload_biblioteca_to_dynamo(book_details)
+            pass
+        
+    # TODO upload in batches
+        print('Uploading: ', book_details["title"])
+        upload_biblioteca_to_dynamo(book_details)
         print('Uploaded!!!: ', book_details["title"])
 
 def extract_details(key):
@@ -81,6 +99,10 @@ def upload_nytimes_to_dynamo(book_details):
             "isbn13": {"S": book_details["primary_isbn13"]},
         },
     )
+
+def upload_biblioteca_to_dynamo(book_details):
+    #TODO upload in batch
+    pass
 
 #     bucket, filename = get_info_from_event(event)
 #     author_name = filename.split('/')[0]

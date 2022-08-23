@@ -6,6 +6,8 @@ import os
 import boto3
 import hashlib
 # import stat
+import zipfile
+
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 
@@ -20,9 +22,19 @@ def handler(event, context):
     print('NEW: ', new_hash)
     
     if is_new(new_hash):
-        write_to_s3(filename, new_hash)
+        write_to_s3(file_path=f"/tmp/{filename}", key=f"raw/biblioteca-nacional/{new_hash}.zip")
+        # TODO descomprimir y guardar en otra carpeta
+        with zipfile.ZipFile(f"/tmp/{filename}", 'r') as zip_ref:
+            csvs = zip_ref.namelist()
+            zip_ref.extractall("/tmp/")
+        new_keys = []
+        for csv in csvs:
+            key = write_to_s3(file_path=f"/tmp/{csv}", key=f"unzip/{new_hash}/{csv}")
+            new_keys.append(key)
+        return new_keys
     else:
         logging.info("The file already exists")
+        return None
 
 
 def get_download_url(soup):
@@ -68,13 +80,15 @@ def get_older_hashes(prefix):
     print(files)
     return [file['Key'].split('/')[-1].split('.')[0] for file in files]
 
-def write_to_s3(filename, new_hash):
+
+def write_to_s3(file_path, key):
     print('writting')
     s3_client = boto3.client("s3")
     s3_client.upload_file(
-        f"/tmp/{filename}", 
+        file_path, 
         S3_BUCKET, 
-        f"raw/biblioteca-nacional/{new_hash}.zip")
+        key)
+    return key
 
 
 def get_hash(file):
