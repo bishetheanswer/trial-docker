@@ -17,6 +17,8 @@ provider:
         path: lambda/get-books-itbooks/
       get-books-nytimes:
         path: lambda/get-books-nytimes/
+      clean-books-biblioteca:
+        path: lambda/clean-books-biblioteca/
       insert-book:
         path: lambda/insert-book/
       update-table:
@@ -52,6 +54,16 @@ functions:
       SSM_PARAM: /nytimes/api/key
     image:
       name: get-books-nytimes
+
+  clean-books-biblioteca:
+    # handler: lambda/get_books_itbooks.handler
+    timeout: 900
+    role: ${self:custom.labroleArn}
+    environment:
+      S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
+      # DYNAMO_TABLE: "${self:resources.Resources.DynamoTable.Properties.TableName}"
+    image:
+      name: clean-books-biblioteca
 
   insert-book:
     # handler: lambda/get_books_nytimes.handler
