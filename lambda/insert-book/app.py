@@ -48,7 +48,7 @@ def insert_nytimes(books):
 
 def insert_biblioteca(books):
     dynamo_client = boto3.client("dynamodb")
-    batches = np.split(books, 50)
+    batches = np.split(np.array(books), 50)
     for batch in batches:
         logging.info("Processing batch...")
         batch_requests = []
