@@ -62,12 +62,13 @@ functions:
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName} # No puedo usar boto3 con el arn { "Fn::GetAtt": [S3Bucket, DomainName] } 
-      # DYNAMO_TABLE: "${self:resources.Resources.DynamoTable.Properties.TableName}"
+      DYNAMO_TABLE: "${self:resources.Resources.DynamoTable.Properties.TableName}"
     image:
       name: clean-books-biblioteca
 
   insert-book:
     # handler: lambda/get_books_nytimes.handler
+    timeout: 900
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName}
@@ -77,6 +78,7 @@ functions:
   
   update-table:
     # handler: lambda/get_books_nytimes.handler
+    timeout: 900
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }

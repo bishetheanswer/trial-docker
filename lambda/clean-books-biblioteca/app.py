@@ -4,18 +4,29 @@ import unicodedata
 import os
 import json
 import boto3
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 AUTHOR_COL = "Autor Personas"
 S3_BUCKET = os.environ.get('S3_BUCKET')
+DYNAMO_TABLE = os.environ.get('DYNAMO_TABLE')
 
 def handler(event, context):
     # TODO: check if the event is empty. If there are no new books this will fail
     csv_file = event['csv_key']
     csv_path = download_from_s3(key=csv_file, file_path="/tmp/books.csv")
     df = pd.read_csv(csv_path, sep=';')
+    logging.info(f"Before checking in Dynamo {df.shape}")
+    # df['exists_in_dynamo'] = df['idBNE'].apply(lambda x: exists_in_dynamo(x))
+    # df = df[~df["exists_in_dynamo"]]
+    # df = df.drop(columns=['exists_in_dynamo'])
+    logging.info(f"After checking in Dynamo {df.shape}")
     df = drop_rows_and_cols(df)
+    logging.info(f"After drop_rows_and_cols {df.shape}")
     df = clean_author_names(df)
+    logging.info(f"After clean_author_names {df.shape}")
     df = df[
         [
             "idBNE",
@@ -40,11 +51,35 @@ def handler(event, context):
             "enlaces"
         ]
     ]
-    # TODO: check if they are already on Dynamo
+    df = df.fillna('')
+    logging.info(f"After filling NaNs {df.shape}")
     uploaded_keys = upload_to_s3(df)
+    logging.info(f"After uploading to S3 {len(uploaded_keys)}")
     return uploaded_keys
 
     
+
+def exists_in_dynamo(idBNE):
+    """Check whether a book exists in DynamoDB or not based on its idBNE"""
+    dynamo_client = boto3.client("dynamodb", region_name="us-east-1")
+
+    condition = "isbn13 = :idBNE"
+    attributes = {":idBNE": {"S": idBNE}}
+    try:
+        response = dynamo_client.query(
+            TableName=DYNAMO_TABLE,
+            KeyConditionExpression=condition,
+            ExpressionAttributeValues=attributes,
+        )
+    except Exception as e:
+        logging.exception("There was a problem while checking in DynamoDB!")
+        raise e
+    matching_books = response.get("Items", [])
+    if len(matching_books) != 0:
+        return True
+    return False
+
+
 
 # def upload_to_s3(book):
 #     uploaded_keys = []

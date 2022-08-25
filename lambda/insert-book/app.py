@@ -47,8 +47,10 @@ def insert_nytimes(books):
 
 
 def insert_biblioteca(books):
+    logging.info(len(books))
     dynamo_client = boto3.client("dynamodb")
-    batches = np.split(np.array(books), 50)
+    n_batches = (len(books)//25)+1 # batch_write_item only allows to put 25 items at a time
+    batches = np.array_split(np.array(books), n_batches)
     for batch in batches:
         logging.info("Processing batch...")
         batch_requests = []
@@ -56,6 +58,7 @@ def insert_biblioteca(books):
         for book in books_details:
             put_request = craft_put_request_biblioteca(book)
             batch_requests.append(put_request)
+        print(len(batch_requests))
         try:
             dynamo_client.batch_write_item(RequestItems={DYNAMO_TABLE: batch_requests})
         except Exception as e:
@@ -70,20 +73,20 @@ def craft_put_request_biblioteca(book):
             "Item": {
                 "isbn13": {"S": book["idBNE"]},
                 "author": {"S": book["Autor Personas"]},
-                "author_entities": {"S": book["Autor Entidades"]},
+                # "author_entities": {"S": book["Autor Entidades"]},
                 "title": {"S": book["Título"]},
                 "publisher": {"S": book["Editorial"]},
-                "publication_location": {"S": book["Lugar de publicación"]},
-                "publication_date": {"S": book["Fecha de publicación"]},
+                "pub_location": {"S": book["Lugar de publicación"]},
+                "pub_date": {"S": book["Fecha de publicación"]},
                 "references": {"S": book["Citas o referencias"]},
                 "theme": {"S": book["Tema"]},
                 "genre": {"S": book["Género/Forma"]},
-                "related_location": {"S": book["Lugar relacionado"]},
-                "id_related_registries": {"S": book["id registros relacionados"]},
-                "publication_country": {"S": book["País de publicación"]},
+                # "related_location": {"S": book["Lugar relacionado"]},
+                # "related_registries": {"S": book["id registros relacionados"]},
+                "pub_country": {"S": book["País de publicación"]},
                 "language": {"S": book["Lengua de publicación"]},
-                "original_language": {"S": book["Lengua original"]},
-                "other_languages": {"S": book["otras lenguas"]},
+                # "original_language": {"S": book["Lengua original"]},
+                # "other_languages": {"S": book["otras lenguas"]},
                 "document_type": {"S": book["Tipo de documento"]},
                 "urls": {"S": book["enlaces"]},
             }
