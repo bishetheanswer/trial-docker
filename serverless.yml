@@ -3,8 +3,8 @@ service: trial-docker
 frameworkVersion: '3'
 
 custom:
-  labroleArn: arn:aws:iam::${aws:accountId}:role/Administrator 
-  
+  labroleArn: arn:aws:iam::${aws:accountId}:role/Administrator
+
 provider:
   name: aws
   runtime: python3.9
@@ -75,17 +75,23 @@ functions:
       DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
     image:
       name: insert-book
-  
+
   update-table:
     # handler: lambda/get_books_nytimes.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: { "Fn::GetAtt": [S3Bucket, Arn] }
-      DYNAMO_TABLE: ${self:resources.Resources.DynamoTable.Properties.TableName}
+      DYNAMO_TABLE: ${self:resources.Resources.MetadataTable.Properties.TableName}
     image:
       name: update-table
-
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [DynamoTable, StreamArn]
+          batchSize: 5
+          batchWindow: 10
 resources:
   Resources:
     S3Bucket:
@@ -98,21 +104,70 @@ resources:
       Properties:
         TableName: authors
         BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: KEYS_ONLY
         AttributeDefinitions:
           - AttributeName: isbn13
             AttributeType: S
           - AttributeName: author
             AttributeType: S
-        KeySchema: 
+          - AttributeName: title
+            AttributeType: S
+        KeySchema:
           - KeyType: HASH
-            AttributeName: isbn13
-          - KeyType: RANGE
             AttributeName: author
-        
-          
-        
-        
-        
+          - KeyType: RANGE
+            AttributeName: title
+        GlobalSecondaryIndexes:
+        - IndexName: Isbn13Index
+          KeySchema:
+            - AttributeName: isbn13
+              KeyType: HASH
+          Projection:
+            ProjectionType: 'ALL'
+
+    MetadataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: metadata-authors
+        BillingMode: PAY_PER_REQUEST
+        # StreamSpecification:
+        #   StreamViewType: KEYS_ONLY
+        AttributeDefinitions:
+        #   - AttributeName: isbn13
+        #     AttributeType: S
+          - AttributeName: author
+            AttributeType: S
+ #         - AttributeName: n_books
+ #           AttributeType: N
+        KeySchema:
+          - KeyType: HASH
+            AttributeName: author
+#          - KeyType: RANGE
+#            AttributeName: n_books
+#        LocalSecondaryIndexes:
+#        - IndexName: nBooksIndex
+#          KeySchema:
+#            - AttributeName: author
+#              KeyType: HASH
+#            - AttributeName: n_books
+#              KeyType: RANGE
+#          Projection:
+#            ProjectionType: 'KEYS_ONLY'
+        # GlobalSecondaryIndexes:
+        # - IndexName: Isbn13Index
+        #   KeySchema:
+        #     - AttributeName: isbn13
+        #       KeyType: HASH
+#           Projection:
+#             ProjectionType: 'ALL'
+
+
+
+
+
+
+
 #           - AttributeName: name
 #             AttributeType: S
 #         KeySchema:
