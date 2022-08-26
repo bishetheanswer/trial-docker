@@ -147,11 +147,12 @@ def upload_itbook_to_dynamo(book_details):
                 "year": {"N": book_details["year"]},
                 "isbn10": {"S": book_details["isbn10"]},
                 "isbn13": {"S": book_details["isbn13"]},
-                "pages": {"N": int(book_details["pages"])},
-                "rating": {"N": float(book_details["rating"])},
+                "pages": {"N": book_details["pages"]},
+                "rating": {"N": book_details["rating"]},
             },
         )
-    except:
+    except Exception as e:
+        print(e)
         logging.warning(f"There has been problem inserting {book_details['title']}!")
 
 

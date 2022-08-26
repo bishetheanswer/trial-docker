@@ -98,6 +98,7 @@ def exists_in_dynamo(book):
     try:
         response = dynamo_client.query(
             TableName=DYNAMO_TABLE,
+            IndexName='Isbn13Index',
             KeyConditionExpression=condition,
             ExpressionAttributeValues=attributes,
         )

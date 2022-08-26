@@ -41,19 +41,22 @@ def handler(event, context):
 def exists_in_dynamo(book):
     """Check whether a book exists in DynamoDB or not based on its ISBN13"""
     dynamo_client = boto3.client("dynamodb", region_name="us-east-1")
-
+    # print(book)
     isbn13 = book["isbn13"]
+    # print(isbn13)
     condition = "isbn13 = :isbn13"
     attributes = {":isbn13": {"S": isbn13}}
     try:
         response = dynamo_client.query(
             TableName=DYNAMO_TABLE,
+            IndexName="Isbn13Index",
             KeyConditionExpression=condition,
             ExpressionAttributeValues=attributes,
         )
     except Exception as e:
         logging.exception("There was a problem while checking in DynamoDB!")
         raise e
+    # print(response)
     matching_books = response.get("Items", [])
     if len(matching_books) != 0:
         return True
