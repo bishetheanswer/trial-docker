@@ -1,32 +1,32 @@
 ```
 📦authors-homogenization 
  ┣ 📂flows
- ┃ ┣ :snake:apis_flow.py
- ┃ ┣ :snake:biblioteca_flow.py
+ ┃ ┣ 🐍 apis_flow.py
+ ┃ ┣ 🐍 biblioteca_flow.py
  ┣ 📂lambda
  ┃ ┣ 📂clean-books-biblioteca
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┃ ┣ 📂get-books-biblioteca-nacional
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┃ ┣ 📂get-books-itbooks
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┃ ┣ 📂get-books-nytimes
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┃ ┣ 📂insert-book
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┃ ┗ 📂update-table
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┣ 🐳 Dockerfile
+ ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
  ┣ 📜README.md
  ┣ 📜serverless.yml
