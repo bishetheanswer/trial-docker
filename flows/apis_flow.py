@@ -55,5 +55,5 @@ with Flow("ApiBooks") as flow:
 flow.storage = GitHub(
     repo=" bishetheanswer/trial-docker",
     path="flows/apis_flow.py",
-    access_token_secret=Secret("GITHUB_ACCESS_TOKEN")
+    access_token_secret="GITHUB_ACCESS_TOKEN"
 )
