@@ -1,3 +1,38 @@
+```
+📦authors-homogenization 
+ ┣ 📂flows
+ ┃ ┣ :snake:apis_flow.py
+ ┃ ┣ :snake:biblioteca_flow.py
+ ┣ 📂lambda
+ ┃ ┣ 📂clean-books-biblioteca
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┃ ┣ 📂get-books-biblioteca-nacional
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┃ ┣ 📂get-books-itbooks
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┃ ┣ 📂get-books-nytimes
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┃ ┣ 📂insert-book
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┃ ┗ 📂update-table
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┣ 📜app.py
+ ┃ ┃ ┗ 📜requirements.txt
+ ┣ 📜README.md
+ ┣ 📜serverless.yml
+```
+
+
 <!--
 title: 'AWS Python Example'
 description: 'This template demonstrates how to deploy a Python function running on AWS Lambda using the traditional Serverless Framework.'
@@ -9,7 +44,6 @@ priority: 2
 authorLink: 'https://github.com/serverless'
 authorName: 'Serverless, inc.'
 authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
 
 
 # Serverless Framework AWS Python Example
@@ -80,3 +114,4 @@ serverless plugin install -n serverless-python-requirements
 ```
 
 Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
+-->
