@@ -63,7 +63,8 @@ def insert_biblioteca(books):
             dynamo_client.batch_write_item(RequestItems={DYNAMO_TABLE: batch_requests})
         except Exception as e:
             logging.error("There has been a problem writting the batch to Dynamo")
-            raise e
+            logging.exception(e)
+            continue
         logging.info("Batch processed!")
 
 

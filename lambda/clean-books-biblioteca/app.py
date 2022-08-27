@@ -59,25 +59,25 @@ def handler(event, context):
 
     
 
-def exists_in_dynamo(idBNE):
-    """Check whether a book exists in DynamoDB or not based on its idBNE"""
-    dynamo_client = boto3.client("dynamodb", region_name="us-east-1")
+# def exists_in_dynamo(idBNE):
+#     """Check whether a book exists in DynamoDB or not based on its idBNE"""
+#     dynamo_client = boto3.client("dynamodb", region_name="us-east-1")
 
-    condition = "isbn13 = :idBNE"
-    attributes = {":idBNE": {"S": idBNE}}
-    try:
-        response = dynamo_client.query(
-            TableName=DYNAMO_TABLE,
-            KeyConditionExpression=condition,
-            ExpressionAttributeValues=attributes,
-        )
-    except Exception as e:
-        logging.exception("There was a problem while checking in DynamoDB!")
-        raise e
-    matching_books = response.get("Items", [])
-    if len(matching_books) != 0:
-        return True
-    return False
+#     condition = "isbn13 = :idBNE"
+#     attributes = {":idBNE": {"S": idBNE}}
+#     try:
+#         response = dynamo_client.query(
+#             TableName=DYNAMO_TABLE,
+#             KeyConditionExpression=condition,
+#             ExpressionAttributeValues=attributes,
+#         )
+#     except Exception as e:
+#         logging.exception("There was a problem while checking in DynamoDB!")
+#         raise e
+#     matching_books = response.get("Items", [])
+#     if len(matching_books) != 0:
+#         return True
+#     return False
 
 
 

@@ -34,7 +34,7 @@ def handler(event, context):
         return new_keys
     else:
         logging.info("The file already exists")
-        return None
+        return []
 
 
 def get_download_url(soup):
@@ -76,7 +76,10 @@ def get_older_hashes(prefix):
     # return a list with the previous downloads' hash
     s3_client = boto3.client("s3")
     response = s3_client.list_objects_v2(Bucket=S3_BUCKET, Prefix=prefix)
+    print('RESPONSE:', response)
     files = response.get("Contents")
+    if not files:
+        return []
     print(files)
     return [file['Key'].split('/')[-1].split('.')[0] for file in files]
 
