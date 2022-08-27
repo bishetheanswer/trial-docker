@@ -5,6 +5,7 @@ import boto3
 import botocore
 import datetime
 import json
+from prefect.tasks.secrets import PrefectSecret
 
 
 @task(name="GetBooksIt")
@@ -54,5 +55,5 @@ with Flow("ApiBooks") as flow:
 flow.storage = GitHub(
     repo=" bishetheanswer/trial-docker",
     path="flows/apis_flow.py",
-    access_token_secret="GITHUB_ACCESS_TOKEN"
+    access_token_secret=PrefectSecret("GITHUB_ACCESS_TOKEN")
 )
