@@ -62,7 +62,7 @@ with Flow("BibliotecaBooks") as flow:
     )
 
 flow.storage = GitHub(
-    repo=" bishetheanswer/trial-docker",
+    repo="bishetheanswer/trial-docker",
     path="flows/biblioteca_flow.py",
     access_token_secret="GITHUB_ACCESS_TOKEN"
 )
