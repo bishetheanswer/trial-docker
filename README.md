@@ -1,3 +1,4 @@
+# Authors Homogenization 
 ```
 📦authors-homogenization 
  ┣ 📂flows
@@ -31,8 +32,37 @@
  ┣ 📜README.md
  ┣ 📜serverless.yml
 ```
+## Infrastructura
+La infrastructura ha sido definida como IaC (Infrastructure as Code) usando Serverless Framework y puede ser encontrada en `serverless.yml`.
 
+![infra](tfm.png)
+### Lambda
+* `get-books-it-books`: llama a la API de ItBooks, filtra los libros que ya existen en nuestra base de datos, los limpia y los guarda en S3 con el siguiente formato: `clean/{autor}/{isbn13}.json`. Tambien guarda el archivo crudo que recibe en: `raw/itbooks-api/{date}.json`
+* `get-books-nytimes`: llama a la API de NyTimes y realiza un proceso similar a la lambda anterior. Los datos en crudo se guardan en: `raw/nytimes-api/{date}/{category}.json`
+* `get-books-biblioteca-nacional`: hace web scraping a la pagina de la bilbioteca nacional y descarga un archivo .zip que contiene los manuscritos en diferentes archivos .csv. Comprueba usando si hash si ya existe en S3, si no, guarda el archivo en crudo en `raw/biblioteca-nacional/{hash}.zip`. Ademas, extrae los .csv del .zip y los guarda en `unzip/{nombre}.csv`
+* `clean-books-biblioteca`: limpia un .csv proveniente del .zip anteriormente mencionado y guarda la informacion de los libros en `clean/{autor}/{idBNE}.json`
+* `insert-book`: se encarga de insertar los libros en la tabla llamada **authors** en DynamoDB
+* `update-table`: se encarga de actualizar una segunda tabla de DynamoDB llamada **metadata-authors** cada vez que se actualiza la tabla **authors**.
 
+### DynamoDB
+* `authors`: guarda informacion de los autores y los libros:
+    - Partition key: author
+    - Sort key: title
+    - Global Secondary Index: isbn13
+* `metadata-authors`: guarda informacion sobre los autores y el numero de libros que han publicado segun `authors`:
+    - Partition key: author
+ ### S3
+ * `authors-and-books`: S3 bucket en el que se guardan tanto los datos en crudo como limpios
+
+ ### ECR
+ * ECR repository en el que se guardan las imagenes de nuestras lambdas
+
+## Orquestacion
+Todo este proceso esta orquestado mediante **Prefect**. Como storage usamos este mismo repositorio y se ejecuta en un agente local. Ambos flujos estan registrados en Prefect Cloud.
+
+Hemos definido dos flujos:
+* `apis_flow`: flujo encargado de llamar a las apis de ItBook y NyTimes. Tambien se encarga de insertar los libros en la tabla `authors`
+* `biblioteca_flow`: flujo encargado de obtener los libros de la biblioteca nacional, limpiarlos e insertarlos en la tabla `authors`
 <!--
 title: 'AWS Python Example'
 description: 'This template demonstrates how to deploy a Python function running on AWS Lambda using the traditional Serverless Framework.'
