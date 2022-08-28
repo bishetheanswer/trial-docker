@@ -112,7 +112,22 @@ def clean_author_names(df):
         .apply(lambda x: initial_clean(x))
         .str.split("//")
         .apply(lambda x: remove_empty_list_position(x))
-        .explode(AUTHOR_COL)
+        # .explode(AUTHOR_COL)
+        .str.split("_")
+        .apply(lambda x: swap_name_and_surname(x))
+        .apply(lambda x: treat_whitespaces(x))
+        .apply(lambda x: "_".join(x))
+        .apply(lambda x: strip_accents(x))
+        .apply(lambda x: keep_chars_and_separator(x))
+        .apply(lambda x: clean_start_and_end(x))
+    )
+    df = df.explode(AUTHOR_COL)
+    df[AUTHOR_COL] = (  # TODO add examples to each transformation
+        df[AUTHOR_COL]
+        # .apply(lambda x: initial_clean(x))
+        # .str.split("//")
+        # .apply(lambda x: remove_empty_list_position(x))
+        # .explode(AUTHOR_COL)
         .str.split("_")
         .apply(lambda x: swap_name_and_surname(x))
         .apply(lambda x: treat_whitespaces(x))
@@ -132,13 +147,13 @@ def initial_clean(s):
     s = re.sub("\(.*\)", "", s)  # get rid of parenthesis and what is inside
     s = re.sub(
         ",", "_", s
-    )  # need to change comas for other symbol cause they are problematic when splitting an string
+    )  # need to change comas for other symbol cause they are problematic when splitting a string
     s = s.lower()
     return s
 
 
 def remove_empty_list_position(l):
-    return l[:1]
+    return l[:-1]
 
 
 def swap_name_and_surname(l):
