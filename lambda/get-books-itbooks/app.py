@@ -43,9 +43,7 @@ def handler(event, context):
 def exists_in_dynamo(book):
     """Check whether a book exists in DynamoDB or not based on its ISBN13"""
     dynamo_client = boto3.client("dynamodb", region_name="us-east-1")
-    # print(book)
     isbn13 = book["isbn13"]
-    # print(isbn13)
     condition = "isbn13 = :isbn13"
     attributes = {":isbn13": {"S": isbn13}}
     try:
@@ -58,7 +56,6 @@ def exists_in_dynamo(book):
     except Exception as e:
         logging.exception("There was a problem while checking in DynamoDB!")
         raise e
-    # print(response)
     matching_books = response.get("Items", [])
     if len(matching_books) != 0:
         return True
@@ -76,7 +73,6 @@ def upload_to_s3(book, s3):
     If a book has more than one author, duplicate the book as many times as authors
     """
     uploaded_keys = []
-    # s3 = boto3.client("s3")
     authors = book["authors"].split(", ")  # authors are separated by a ","
     for author in authors:
         author = normalize_name(author)

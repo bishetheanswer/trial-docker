@@ -52,7 +52,7 @@ def insert_books(books, source):
 with Flow("BibliotecaBooks") as flow:
     biblioteca_raw_books = get_books_biblioteca()
     biblioteca_clean_books = clean_books_biblioteca(
-        biblioteca_raw_books, 
+        biblioteca_raw_books,
         upstream_tasks=[biblioteca_raw_books],
     )
     insert_biblioteca_books = insert_books(
@@ -64,5 +64,5 @@ with Flow("BibliotecaBooks") as flow:
 flow.storage = GitHub(
     repo="bishetheanswer/trial-docker",
     path="flows/biblioteca_flow.py",
-    access_token_secret="GITHUB_ACCESS_TOKEN"
+    access_token_secret="GITHUB_ACCESS_TOKEN",
 )

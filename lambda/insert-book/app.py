@@ -49,7 +49,9 @@ def insert_nytimes(books):
 def insert_biblioteca(books):
     logging.info(len(books))
     dynamo_client = boto3.client("dynamodb")
-    n_batches = (len(books)//25)+1 # batch_write_item only allows to put 25 items at a time
+    n_batches = (
+        len(books) // 25
+    ) + 1  # batch_write_item only allows to put 25 items at a time
     batches = np.array_split(np.array(books), n_batches)
     for batch in batches:
         logging.info("Processing batch...")
@@ -74,7 +76,6 @@ def craft_put_request_biblioteca(book):
             "Item": {
                 "isbn13": {"S": book["idBNE"]},
                 "author": {"S": book["Autor Personas"]},
-                # "author_entities": {"S": book["Autor Entidades"]},
                 "title": {"S": book["Título"]},
                 "publisher": {"S": book["Editorial"]},
                 "pub_location": {"S": book["Lugar de publicación"]},
@@ -82,44 +83,13 @@ def craft_put_request_biblioteca(book):
                 "references": {"S": book["Citas o referencias"]},
                 "theme": {"S": book["Tema"]},
                 "genre": {"S": book["Género/Forma"]},
-                # "related_location": {"S": book["Lugar relacionado"]},
-                # "related_registries": {"S": book["id registros relacionados"]},
                 "pub_country": {"S": book["País de publicación"]},
                 "language": {"S": book["Lengua de publicación"]},
-                # "original_language": {"S": book["Lengua original"]},
-                # "other_languages": {"S": book["otras lenguas"]},
                 "document_type": {"S": book["Tipo de documento"]},
                 "urls": {"S": book["enlaces"]},
             }
         }
     }
-
-
-# put_request = {
-#             "PutRequest": {
-#                 "Item": {
-#                     "Tipo": {"S": "Alumno"},
-#                     "Registro": {"N": str(ts_actual+i)},
-#                     "Especialidad": {"S": "AWS"}
-#                 }
-#             }
-#         }
-#         actions_for_table.append(put_request)
-
-
-# print('These are books from the BIBLIOTECA')
-# batch = []
-# for book in books:
-#     book_details = extract_details(book)
-#     batch.append(book_details)
-#     if len(batch) == 20:
-#         upload_biblioteca_to_dynamo(book_details)
-#         pass
-
-# # TODO upload in batches
-#     print('Uploading: ', book_details["title"])
-#     upload_biblioteca_to_dynamo(book_details)
-#     print('Uploaded!!!: ', book_details["title"])
 
 
 def extract_details(key):
@@ -173,46 +143,3 @@ def upload_nytimes_to_dynamo(book_details):
         )
     except:
         logging.warning(f"There has been problem inserting {book_details['title']}!")
-
-
-def upload_biblioteca_to_dynamo(book_details):
-    # TODO upload in batch
-    pass
-
-
-#     bucket, filename = get_info_from_event(event)
-#     author_name = filename.split('/')[0]
-
-#     s3 = boto3.client("s3")
-#     s3.download_file(bucket, filename, "/tmp/book_details.json")
-
-#     with open("/tmp/book_details.json", "r") as f:
-#         book_details = json.loads(f.read())
-
-#     # book_details["author_name"] = {"S": author_name}
-#     # book_details["title"] = {"S": book_details["title"]}
-
-#     # response = table.put_item(Item=book_details)
-
-#     dynamo_client.put_item(
-#         TableName=DYNAMO_TABLE,
-#         Item={
-#             "author_name": {"S": author_name},
-#             "title": {"S": book_details["title"]},
-#             "publisher": {"S": book_details["publisher"]},
-#             "language": {"S": book_details["language"]},
-#             "year": {"N": book_details["year"]},
-#             "isbn10": {"S": book_details["isbn10"]},
-#             "isbn13": {"S": book_details["isbn13"]},
-#         },
-#     )
-#     # Key={
-#     #     'fecha_subida': {'S': fecha_subida},
-#     #     'etiqueta': {'S': etiqueta}
-#     # },
-
-
-# def get_info_from_event(event):
-#     bucket = event["Records"][0]["s3"]["bucket"]["name"]
-#     filename = event["Records"][0]["s3"]["object"]["key"]
-#     return bucket, filename

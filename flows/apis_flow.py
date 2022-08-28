@@ -1,12 +1,9 @@
-import prefect
 from prefect.storage import GitHub
-from prefect import task, Flow, unmapped
+from prefect import task, Flow
 import boto3
 import botocore
-import datetime
 import json
-# from prefect.tasks.secrets import PrefectSecret
-from prefect.client.secrets import Secret
+
 
 @task(name="GetBooksIt")
 def get_books_itbooks():
@@ -45,15 +42,20 @@ def insert_books(books, source):
     )
     assert response["StatusCode"] < 300
 
+
 with Flow("ApiBooks") as flow:
     it_books = get_books_itbooks()
     nytimes_books = get_books_nytimes()
-    insert_it_books = insert_books(it_books,source='itbooks-api', upstream_tasks=[it_books])
-    insert_nytimes_books = insert_books(nytimes_books, source='nytimes-api', upstream_tasks=[nytimes_books])
+    insert_it_books = insert_books(
+        it_books, source="itbooks-api", upstream_tasks=[it_books]
+    )
+    insert_nytimes_books = insert_books(
+        nytimes_books, source="nytimes-api", upstream_tasks=[nytimes_books]
+    )
 
 
 flow.storage = GitHub(
     repo="bishetheanswer/trial-docker",
     path="flows/apis_flow.py",
-    access_token_secret="GITHUB_ACCESS_TOKEN"
+    access_token_secret="GITHUB_ACCESS_TOKEN",
 )

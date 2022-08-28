@@ -9,7 +9,6 @@ provider:
   name: aws
   runtime: python3.9
   ecr:
-    # In this section you can define images that will be built locally and uploaded to ECR
     images:
       get-books-biblioteca-nacional:
         path: lambda/get-books-biblioteca-nacional/
@@ -26,7 +25,6 @@ provider:
 
 functions:
   get-books-biblioteca-nacional:
-    # handler: lambda/get_books_itbooks.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -36,7 +34,6 @@ functions:
       name: get-books-biblioteca-nacional
 
   get-books-itbooks:
-    # handler: lambda/get_books_itbooks.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -46,7 +43,6 @@ functions:
       name: get-books-itbooks
 
   get-books-nytimes:
-    # handler: lambda/get_books_nytimes.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -57,7 +53,6 @@ functions:
       name: get-books-nytimes
 
   clean-books-biblioteca:
-    # handler: lambda/get_books_itbooks.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -67,7 +62,6 @@ functions:
       name: clean-books-biblioteca
 
   insert-book:
-    # handler: lambda/get_books_nytimes.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -77,7 +71,6 @@ functions:
       name: insert-book
 
   update-table:
-    # handler: lambda/get_books_nytimes.handler
     timeout: 900
     role: ${self:custom.labroleArn}
     environment:
@@ -131,75 +124,9 @@ resources:
       Properties:
         TableName: metadata-authors
         BillingMode: PAY_PER_REQUEST
-        # StreamSpecification:
-        #   StreamViewType: KEYS_ONLY
         AttributeDefinitions:
-        #   - AttributeName: isbn13
-        #     AttributeType: S
           - AttributeName: author
             AttributeType: S
- #         - AttributeName: n_books
- #           AttributeType: N
         KeySchema:
           - KeyType: HASH
             AttributeName: author
-#          - KeyType: RANGE
-#            AttributeName: n_books
-#        LocalSecondaryIndexes:
-#        - IndexName: nBooksIndex
-#          KeySchema:
-#            - AttributeName: author
-#              KeyType: HASH
-#            - AttributeName: n_books
-#              KeyType: RANGE
-#          Projection:
-#            ProjectionType: 'KEYS_ONLY'
-        # GlobalSecondaryIndexes:
-        # - IndexName: Isbn13Index
-        #   KeySchema:
-        #     - AttributeName: isbn13
-        #       KeyType: HASH
-#           Projection:
-#             ProjectionType: 'ALL'
-
-
-
-
-
-
-
-#           - AttributeName: name
-#             AttributeType: S
-#         KeySchema:
-#           - AttributeName: name
-#             KeyType: HASH
-#             AttributeName: "isbn13"
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-
-
-#           {
-#   "TableName": "authors",
-#   "KeySchema": [
-#     {
-#       "KeyType": "HASH",
-#       "AttributeName": "isbn13"
-#     },
-#     {
-#       "KeyType": "RANGE",
-#       "AttributeName": "author"
-#     }
-#   ],
-#   "AttributeDefinitions": [
-#     {
-#       "AttributeName": "isbn13",
-#       "AttributeType": "S"
-#     },
-#     {
-#       "AttributeName": "author",
-#       "AttributeType": "S"
-#     }
-#   ],
-#   "BillingMode": "PAY_PER_REQUEST"
-# }
