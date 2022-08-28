@@ -9,7 +9,7 @@ from prefect.executors import LocalDaskExecutor
 import numpy as np
 
 
-@task(name="GetBooksBiblioteca")
+@task(name="GetBooksBiblioteca", cache_for=datetime.timedelta(days=1))
 def get_books_biblioteca():
     lambda_client = boto3.client("lambda")
     response = lambda_client.invoke(
@@ -21,7 +21,7 @@ def get_books_biblioteca():
     return payload  # TODO return only first because of testing purposes
 
 
-@task(name="CleanBooksBiblioteca")
+@task(name="CleanBooksBiblioteca", cache_for=datetime.timedelta(days=1))
 def clean_books_biblioteca(csv_key):
     config = botocore.config.Config(  # https://github.com/boto/boto3/issues/2424
         read_timeout=900, connect_timeout=900, retries={"max_attempts": 0}
@@ -40,7 +40,7 @@ def clean_books_biblioteca(csv_key):
 @task(name="CreateBooksBatches")
 def create_books_batches(keys):
     books = np.array(keys)
-    batches = np.array_split(books, 30)
+    batches = np.array_split(books, 10)
     return [list(l) for l in batches]
 
 
