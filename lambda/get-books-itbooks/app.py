@@ -15,7 +15,9 @@ DYNAMO_TABLE = os.environ.get("DYNAMO_TABLE")
 
 
 def handler(event, context):
-    """Get books from the itbooks API, store raw data and new books to S3"""
+    """Get books from the itbooks API, store raw data and new books to S3
+    https://api.itbook.store/
+    """
     s3_client = boto3.client("s3")
     logging.info("Requesting books...")
     r = requests.get("https://api.itbook.store/1.0/new").json()

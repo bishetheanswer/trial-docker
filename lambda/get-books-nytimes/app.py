@@ -16,7 +16,9 @@ SSM_PARAM = os.environ.get("SSM_PARAM")
 
 
 def handler(event, context):
-    """Get books from the nytimes API, store raw data and new books to S3"""
+    """Get books from the nytimes API, store raw data and new books to S3
+    https://developer.nytimes.com/docs/books-product/1/overview
+    """
     ssm_client = boto3.client("ssm", region_name="us-east-1")
     s3_client = boto3.client("s3")
 
