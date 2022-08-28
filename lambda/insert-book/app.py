@@ -12,7 +12,7 @@ DYNAMO_TABLE = os.environ.get("DYNAMO_TABLE")
 
 
 def handler(event, context):
-    source, books = get_info_from_event(event)
+    source, books = event["source"], event["books"]
     if source == "itbooks-api":
         logging.info(f"Inserting books from {source}")
         insert_itbooks(books)
@@ -24,12 +24,6 @@ def handler(event, context):
         insert_biblioteca(books)
     else:
         logging.warning(f"Could not detect the source: {source}")
-
-
-def get_info_from_event(event):
-    source = event["source"]
-    books = event["books"]
-    return source, books
 
 
 def insert_itbooks(books):
