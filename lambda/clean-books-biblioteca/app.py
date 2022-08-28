@@ -44,6 +44,7 @@ def handler(event, context):
         ]
     ]
     df = df.fillna("")
+    df = df.drop_duplicates(subset=['Autor Personas', 'Título'])
     uploaded_keys = upload_to_s3(df)
     return uploaded_keys
 

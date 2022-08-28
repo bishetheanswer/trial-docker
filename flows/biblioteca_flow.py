@@ -16,7 +16,7 @@ def get_books_biblioteca():
     )
     assert response["StatusCode"] < 300
     payload = json.loads(response["Payload"].read())
-    return payload[0]  # TODO return only first because of testing purposes
+    return payload  # TODO return only first because of testing purposes
 
 
 @task(name="CleanBooksBiblioteca")
@@ -51,13 +51,13 @@ def insert_books(books, source):
 
 with Flow("BibliotecaBooks") as flow:
     biblioteca_raw_books = get_books_biblioteca()
-    biblioteca_clean_books = clean_books_biblioteca(
+    biblioteca_clean_books = clean_books_biblioteca.map(
         biblioteca_raw_books,
         upstream_tasks=[biblioteca_raw_books],
     )
-    insert_biblioteca_books = insert_books(
+    insert_biblioteca_books = insert_books.map(
         biblioteca_clean_books,
-        source="biblioteca",
+        source=unmapped("biblioteca"),
         upstream_tasks=[biblioteca_clean_books],
     )
 
