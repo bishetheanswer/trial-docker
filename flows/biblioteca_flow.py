@@ -68,11 +68,13 @@ with Flow("BibliotecaBooks") as flow:
         biblioteca_clean_books,
         upstream_tasks=[biblioteca_clean_books],
     )
-    insert_biblioteca_books = insert_books.map(
-        books_batches,
-        source=unmapped("biblioteca"),
-        upstream_tasks=[books_batches],
-    )
+    for batch in books_batches:
+        insert_books = insert_books(batch, source='biblioteca', upstream_tasks=[books_batches])
+    # insert_biblioteca_books = insert_books.map(
+    #     books_batches,
+    #     source=unmapped("biblioteca"),
+    #     upstream_tasks=[books_batches],
+    # )
 
 flow.executor = LocalDaskExecutor()
 flow.storage = GitHub(
