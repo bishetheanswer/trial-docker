@@ -5,6 +5,7 @@ import boto3
 import botocore
 import datetime
 import json
+from prefect.executors import LocalDaskExecutor
 
 
 @task(name="GetBooksBiblioteca")
@@ -61,6 +62,7 @@ with Flow("BibliotecaBooks") as flow:
         upstream_tasks=[biblioteca_clean_books],
     )
 
+flow.executor = LocalDaskExecutor()
 flow.storage = GitHub(
     repo="bishetheanswer/trial-docker",
     path="flows/biblioteca_flow.py",
