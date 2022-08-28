@@ -38,7 +38,7 @@
 ## Infrastructura
 La infrastructura ha sido definida como IaC (Infrastructure as Code) usando Serverless Framework y puede ser encontrada en `serverless.yml`.
 
-![infra](tfm.png)
+![infra](imgs/infra.png)
 ### Lambda
 * `get-books-it-books`: llama a la API de ItBooks, filtra los libros que ya existen en nuestra base de datos, los limpia y los guarda en S3 con el siguiente formato: `clean/{autor}/{isbn13}.json`. Tambien guarda el archivo crudo que recibe en: `raw/itbooks-api/{date}.json`
 * `get-books-nytimes`: llama a la API de NyTimes y realiza un proceso similar a la lambda anterior. Los datos en crudo se guardan en: `raw/nytimes-api/{date}/{category}.json`
