@@ -3,6 +3,7 @@ from prefect import task, Flow
 import boto3
 import botocore
 import json
+from prefect.executors import LocalDaskExecutor
 
 
 @task(name="GetBooksIt")
@@ -54,6 +55,7 @@ with Flow("ApiBooks") as flow:
     )
 
 
+flow.executor = LocalDaskExecutor()
 flow.storage = GitHub(
     repo="bishetheanswer/trial-docker",
     path="flows/apis_flow.py",

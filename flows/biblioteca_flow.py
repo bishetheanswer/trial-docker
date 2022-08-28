@@ -6,6 +6,7 @@ import botocore
 import datetime
 import json
 from prefect.executors import LocalDaskExecutor
+import numpy as np
 
 
 @task(name="GetBooksBiblioteca")
@@ -36,6 +37,13 @@ def clean_books_biblioteca(csv_key):
     return payload
 
 
+@task(name="CreateBooksBatches")
+def create_books_batches(keys):
+    books = np.array(keys)
+    batches = np.array_split(books, 30)
+    return [list(l) for l in batches]
+
+
 @task(name="InsertBooks")
 def insert_books(books, source):
     config = botocore.config.Config(  # https://github.com/boto/boto3/issues/2424
@@ -56,10 +64,14 @@ with Flow("BibliotecaBooks") as flow:
         biblioteca_raw_books,
         upstream_tasks=[biblioteca_raw_books],
     )
-    insert_biblioteca_books = insert_books.map(
+    books_batches = create_books_batches(
         biblioteca_clean_books,
-        source=unmapped("biblioteca"),
         upstream_tasks=[biblioteca_clean_books],
+    )
+    insert_biblioteca_books = insert_books.map(
+        books_batches,
+        source=unmapped("biblioteca"),
+        upstream_tasks=[books_batches],
     )
 
 flow.executor = LocalDaskExecutor()
