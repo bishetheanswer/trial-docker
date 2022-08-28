@@ -3,6 +3,7 @@ import boto3
 import os
 import numpy as np
 import logging
+import itertools
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -21,6 +22,11 @@ def handler(event, context):
         insert_nytimes(books)
     elif source == "biblioteca":
         logging.info(f"Inserting books from {source}")
+        print(books)
+        print(type(books))
+        books = list(itertools.chain(*books))
+        print('AFFFFTER')
+        print(books)
         insert_biblioteca(books)
     else:
         logging.warning(f"Could not detect the source: {source}")

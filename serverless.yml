@@ -63,6 +63,7 @@ functions:
 
   insert-book:
     timeout: 900
+    # reservedConcurrency: 10
     role: ${self:custom.labroleArn}
     environment:
       S3_BUCKET: ${self:resources.Resources.S3Bucket.Properties.BucketName}

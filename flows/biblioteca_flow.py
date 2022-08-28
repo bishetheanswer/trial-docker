@@ -7,6 +7,7 @@ import datetime
 import json
 from prefect.executors import LocalDaskExecutor
 import numpy as np
+import itertools
 
 
 @task(name="GetBooksBiblioteca") #, cache_for=datetime.timedelta(days=1))
@@ -18,7 +19,7 @@ def get_books_biblioteca():
     )
     assert response["StatusCode"] < 300
     payload = json.loads(response["Payload"].read())
-    return payload[:2]  # TODO return only first because of testing purposes
+    return payload[0:3:2]  # TODO return only first because of testing purposes
 
 
 @task(name="CleanBooksBiblioteca") # , cache_for=datetime.timedelta(days=1))
@@ -39,6 +40,9 @@ def clean_books_biblioteca(csv_key):
 
 @task(name="CreateBooksBatches")
 def create_books_batches(keys):
+    print(len(keys))
+    keys = list(itertools.chain(*keys))
+
     books = np.array(keys)
     batches = np.array_split(books, 10)
     return [list(l) for l in batches]
