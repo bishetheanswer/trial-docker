@@ -11,7 +11,7 @@ import json
 def get_books_biblioteca():
     lambda_client = boto3.client("lambda")
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-get-books-biblioteca-nacional",
+        FunctionName="authors-homogenization-dev-get-books-biblioteca-nacional",
         InvocationType="RequestResponse",
     )
     assert response["StatusCode"] < 300
@@ -26,7 +26,7 @@ def clean_books_biblioteca(csv_key):
     )
     lambda_client = boto3.client("lambda", config=config)
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-clean-books-biblioteca",
+        FunctionName="authors-homogenization-dev-clean-books-biblioteca",
         InvocationType="RequestResponse",
         Payload=json.dumps({"csv_key": csv_key}),
     )
@@ -42,7 +42,7 @@ def insert_books(books, source):
     )
     lambda_client = boto3.client("lambda", config=config)
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-insert-book",
+        FunctionName="authors-homogenization-dev-insert-book",
         InvocationType="RequestResponse",
         Payload=json.dumps({"source": source, "books": books}),
     )

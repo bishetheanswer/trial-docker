@@ -1,4 +1,4 @@
-service: trial-docker
+service: authors-homogenization
 
 frameworkVersion: '3'
 
@@ -85,6 +85,7 @@ functions:
             Fn::GetAtt: [DynamoTable, StreamArn]
           batchSize: 5
           batchWindow: 10
+
 resources:
   Resources:
     S3Bucket:

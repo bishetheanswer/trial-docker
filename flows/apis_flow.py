@@ -9,7 +9,7 @@ import json
 def get_books_itbooks():
     lambda_client = boto3.client("lambda")
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-get-books-itbooks",
+        FunctionName="authors-homogenization-dev-get-books-itbooks",
         InvocationType="RequestResponse",
     )
     assert response["StatusCode"] < 300  # TODO change
@@ -21,7 +21,7 @@ def get_books_itbooks():
 def get_books_nytimes():
     lambda_client = boto3.client("lambda")
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-get-books-nytimes",
+        FunctionName="authors-homogenization-dev-get-books-nytimes",
         InvocationType="RequestResponse",
     )
     assert response["StatusCode"] < 300
@@ -36,7 +36,7 @@ def insert_books(books, source):
     )
     lambda_client = boto3.client("lambda", config=config)
     response = lambda_client.invoke(
-        FunctionName="trial-docker-dev-insert-book",
+        FunctionName="authors-homogenization-dev-insert-book",
         InvocationType="RequestResponse",
         Payload=json.dumps({"source": source, "books": books}),
     )
