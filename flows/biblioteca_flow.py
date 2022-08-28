@@ -40,9 +40,7 @@ def clean_books_biblioteca(csv_key):
 
 @task(name="CreateBooksBatches")
 def create_books_batches(keys):
-    print(len(keys))
-    keys = list(itertools.chain(*keys))
-
+    keys = list(itertools.chain(*keys)) # flatten the list
     books = np.array(keys)
     batches = np.array_split(books, 10)
     return [list(l) for l in batches]
@@ -72,8 +70,6 @@ with Flow("BibliotecaBooks") as flow:
         biblioteca_clean_books,
         upstream_tasks=[biblioteca_clean_books],
     )
-    # for batch in books_batches:
-    #     insert_books = insert_books(batch, source='biblioteca', upstream_tasks=[books_batches])
     insert_biblioteca_books = insert_books.map(
         books_batches,
         source=unmapped("biblioteca"),
