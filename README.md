@@ -29,6 +29,9 @@
  ┃ ┃ ┣ 🐳 Dockerfile
  ┃ ┃ ┣ 🐍 app.py
  ┃ ┃ ┗ 📜requirements.txt
+ ┣ 📂scripts
+ ┃ ┣ 📜prefect_agent_init.sh
+ ┃ ┗ 📜register_flows.sh
  ┣ 📜README.md
  ┣ 📜serverless.yml
 ```
@@ -63,6 +66,10 @@ Todo este proceso esta orquestado mediante **Prefect**. Como storage usamos este
 Hemos definido dos flujos:
 * `apis_flow`: flujo encargado de llamar a las apis de ItBook y NyTimes. Tambien se encarga de insertar los libros en la tabla `authors`
 * `biblioteca_flow`: flujo encargado de obtener los libros de la biblioteca nacional, limpiarlos e insertarlos en la tabla `authors`
+
+Hemos creado 2 scripts para trabajar con prefect de forma mas comoda:
+* `scripts/prefect_agent_init.sh`: inicializa el agente de prefect que ejecutara las tareas
+* `scripts/register_flows.sh`: lista los flows de `flows/` y deja al usuario escoger que flow registrar. Todos los flows se registran en el mismo proyecto y asume que se esta ejecutando desde la raiz del repositorio.
 <!--
 title: 'AWS Python Example'
 description: 'This template demonstrates how to deploy a Python function running on AWS Lambda using the traditional Serverless Framework.'
