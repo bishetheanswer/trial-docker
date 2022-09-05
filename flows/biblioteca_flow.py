@@ -42,7 +42,7 @@ def clean_books_biblioteca(csv_key):
 def create_books_batches(keys):
     keys = list(itertools.chain(*keys)) # flatten the list
     books = np.array(keys)
-    batches = np.array_split(books, 10)
+    batches = np.array_split(books, 40)
     return [list(l) for l in batches]
 
 
