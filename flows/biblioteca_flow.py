@@ -19,8 +19,8 @@ def get_books_biblioteca():
     )
     assert response["StatusCode"] < 300
     payload = json.loads(response["Payload"].read())
-    return payload[0:3:2]  # TODO return only first because of testing purposes
-
+#    return payload[0:3:2]  # TODO return only first because of testing purposes
+    return payload
 
 @task(name="CleanBooksBiblioteca") # , cache_for=datetime.timedelta(days=1))
 def clean_books_biblioteca(csv_key):
