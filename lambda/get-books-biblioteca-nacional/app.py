@@ -14,6 +14,7 @@ S3_BUCKET = os.environ.get("S3_BUCKET")
 
 
 def handler(event, context):
+    """Get books from Biblioteca Nacional using web scraping"""
     page = requests.get(
         "https://datos.gob.es/es/catalogo/ea0019768-registros-bibliograficos-de-manuscritos-y-archivos-personales-de-la-biblioteca-nacional-de-espana"
     )
@@ -105,6 +106,7 @@ def write_to_s3(file_path, key):
 
 
 def get_hash(file):
+    """Get hash from a file"""
     # https://www.geeksforgeeks.org/compare-two-files-using-hashing-in-python/
     # An arbitrary (but fixed) buffer
     # size (change accordingly)

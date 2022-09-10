@@ -29,14 +29,12 @@ def handler(event, context):
 def insert_itbooks(books):
     for book in books:
         book_details = extract_details(book)
-        print("Uploading: ", book_details["title"])
         upload_itbook_to_dynamo(book_details)
 
 
 def insert_nytimes(books):
     for book in books:
         book_details = extract_details(book)
-        print("Uploading: ", book_details["title"])
         upload_nytimes_to_dynamo(book_details)
 
 
@@ -54,7 +52,6 @@ def insert_biblioteca(books):
         for book in books_details:
             put_request = craft_put_request_biblioteca(book)
             batch_requests.append(put_request)
-        print(len(batch_requests))
         try:
             dynamo_client.batch_write_item(RequestItems={DYNAMO_TABLE: batch_requests})
         except Exception as e:
@@ -117,9 +114,8 @@ def upload_itbook_to_dynamo(book_details):
             },
         )
     except Exception as e:
-        print(e)
         logging.warning(f"There has been problem inserting {book_details['title']}!")
-
+        logging.exception(e)
 
 def upload_nytimes_to_dynamo(book_details):
     dynamo_client = boto3.client("dynamodb")

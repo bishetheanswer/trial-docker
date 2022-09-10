@@ -5,6 +5,7 @@ from datetime import datetime
 import boto3
 import unicodedata
 import logging
+import time
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -30,6 +31,7 @@ def handler(event, context):
     for category in book_categories:
         try:
             process_books_from_category(category, api_key, uploaded_keys, s3_client)
+            time.sleep(6)
         except:
             logging.warning(
                 f"There was a problem getting {category} books skipping to the next one..."
