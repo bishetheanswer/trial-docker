@@ -64,7 +64,7 @@ def insert_books(books, source):
     assert response["StatusCode"] < 300
 
 
-schedule = Schedule(clocks=[IntervalClock(timedelta(months=3))])
+schedule = Schedule(clocks=[IntervalClock(timedelta(days=90))])
 with Flow("BibliotecaBooks", schedule=schedule) as flow:
     biblioteca_raw_books = get_books_biblioteca()
     biblioteca_clean_books = clean_books_biblioteca.map(
