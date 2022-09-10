@@ -35,8 +35,8 @@
  ┣ 📜README.md
  ┣ 📜serverless.yml
 ```
-## Infrastructura
-La infrastructura ha sido definida como IaC (Infrastructure as Code) usando Serverless Framework y puede ser encontrada en `serverless.yml`.
+## Infraestructura
+La infraestructura ha sido definida como IaC (Infrastructure as Code) usando Serverless Framework y puede ser encontrada en `serverless.yml`.
 
 ![infra](imgs/infra.png)
 ### Lambda
