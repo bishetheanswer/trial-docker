@@ -7,6 +7,8 @@ import boto3
 import hashlib
 import zipfile
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 
@@ -21,19 +23,25 @@ def handler(event, context):
     assert url, "Could not find any URL to download an UTF8 csv"
     filename = download_file(url)
     new_hash = get_hash(filename)
-    print("NEW: ", new_hash)
+    logging.info(f"New hash: {new_hash}")
 
     if is_new(new_hash):
         write_to_s3(
             file_path=f"/tmp/{filename}", key=f"raw/biblioteca-nacional/{new_hash}.zip"
         )
         with zipfile.ZipFile(f"/tmp/{filename}", "r") as zip_ref:
+            logging.info("Extracting CSVs...")
             csvs = zip_ref.namelist()
             zip_ref.extractall("/tmp/")
         new_keys = []
         for csv in csvs:
-            key = write_to_s3(file_path=f"/tmp/{csv}", key=f"unzip/{new_hash}/{csv}")
-            new_keys.append(key)
+            try:
+                key = write_to_s3(
+                    file_path=f"/tmp/{csv}", key=f"unzip/{new_hash}/{csv}"
+                )
+                new_keys.append(key)
+            except:
+                logging.warning(f"There was an error writting {csv} to S3!")
         return new_keys
     else:
         logging.info("The file already exists")
@@ -42,6 +50,7 @@ def handler(event, context):
 
 def get_download_url(soup):
     """Find the url that contains a zip file with a csv in UTF8 format"""
+    logging.info("Finding zip url...")
     pattern = "https://.*UTF8.*\.zip"
     resources = soup.find(id="dataset-resources")
     for a in resources.find_all("a", href=True):
@@ -53,6 +62,7 @@ def get_download_url(soup):
 
 def download_file(url):
     """Download file from url"""
+    logging.info("Downloading file...")
     zip_file = requests.get(url)
     filename = url.split("/")[-1]
     with open(f"/tmp/{filename}", "wb") as output_file:
@@ -61,27 +71,36 @@ def download_file(url):
 
 
 def is_new(new_hash):
+    """Check whether the hash is new or not"""
+    logging.info(f"Checking whether {new_hash} is new...")
     older_hashes = get_older_hashes("raw/biblioteca-nacional/")
-    print(older_hashes)
-    print(new_hash not in older_hashes)
     return new_hash not in older_hashes
 
 
 def get_older_hashes(prefix):
+    """Get old hashes from filenames"""
+    logging.info("Getting old hashes...")
     s3_client = boto3.client("s3")
-    response = s3_client.list_objects_v2(Bucket=S3_BUCKET, Prefix=prefix)
-    print("RESPONSE:", response)
+    try:
+        response = s3_client.list_objects_v2(Bucket=S3_BUCKET, Prefix=prefix)
+    except Exception as e:
+        logging.exception(f"There was a problem listing the objects in {prefix}!")
+        raise e
     files = response.get("Contents")
     if not files:
         return []
-    print(files)
     return [file["Key"].split("/")[-1].split(".")[0] for file in files]
 
 
 def write_to_s3(file_path, key):
-    print("writting")
+    """Write file to S3"""
+    logging.info(f"Writting {key} to S3...")
     s3_client = boto3.client("s3")
-    s3_client.upload_file(file_path, S3_BUCKET, key)
+    try:
+        s3_client.upload_file(file_path, S3_BUCKET, key)
+    except Exception as e:
+        logging.exception(f"There was a problem uploading {key} to S3!")
+        raise e
     return key
 
 
@@ -90,6 +109,7 @@ def get_hash(file):
     # An arbitrary (but fixed) buffer
     # size (change accordingly)
     # 65536 = 65536 bytes = 64 kilobytes
+    logging.info("Getting file hash...")
     BUF_SIZE = 65536
 
     # Initializing the sha256() method

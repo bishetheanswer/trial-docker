@@ -16,6 +16,7 @@ DYNAMO_TABLE = os.environ.get("DYNAMO_TABLE")
 
 
 def handler(event, context):
+    """Clean books from a CSV file"""
     csv_file = event["csv_key"]
     logging.info(f"CSV file: {csv_file}")
     csv_path = download_from_s3(key=csv_file, file_path="/tmp/books.csv")
