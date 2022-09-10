@@ -8,9 +8,12 @@ import json
 from prefect.executors import LocalDaskExecutor
 import numpy as np
 import itertools
+from datetime import timedelta
+from prefect.schedules import Schedule
+from prefect.schedules.clocks import IntervalClock
 
 
-@task(name="GetBooksBiblioteca") #, cache_for=datetime.timedelta(days=1))
+@task(name="GetBooksBiblioteca")  # , cache_for=datetime.timedelta(days=1))
 def get_books_biblioteca():
     lambda_client = boto3.client("lambda")
     response = lambda_client.invoke(
@@ -19,10 +22,11 @@ def get_books_biblioteca():
     )
     assert response["StatusCode"] < 300
     payload = json.loads(response["Payload"].read())
-#    return payload[0:3:2]  # TODO return only first because of testing purposes
+    #    return payload[0:3:2]  # TODO return only first because of testing purposes
     return payload
 
-@task(name="CleanBooksBiblioteca") # , cache_for=datetime.timedelta(days=1))
+
+@task(name="CleanBooksBiblioteca")  # , cache_for=datetime.timedelta(days=1))
 def clean_books_biblioteca(csv_key):
     config = botocore.config.Config(  # https://github.com/boto/boto3/issues/2424
         read_timeout=900, connect_timeout=900, retries={"max_attempts": 0}
@@ -40,7 +44,7 @@ def clean_books_biblioteca(csv_key):
 
 @task(name="CreateBooksBatches")
 def create_books_batches(keys):
-    keys = list(itertools.chain(*keys)) # flatten the list
+    keys = list(itertools.chain(*keys))  # flatten the list
     books = np.array(keys)
     batches = np.array_split(books, 40)
     return [list(l) for l in batches]
@@ -60,7 +64,8 @@ def insert_books(books, source):
     assert response["StatusCode"] < 300
 
 
-with Flow("BibliotecaBooks") as flow:
+schedule = Schedule(clocks=[IntervalClock(timedelta(months=3))])
+with Flow("BibliotecaBooks", schedule=schedule) as flow:
     biblioteca_raw_books = get_books_biblioteca()
     biblioteca_clean_books = clean_books_biblioteca.map(
         biblioteca_raw_books,

@@ -4,6 +4,9 @@ import boto3
 import botocore
 import json
 from prefect.executors import LocalDaskExecutor
+from datetime import timedelta
+from prefect.schedules import Schedule
+from prefect.schedules.clocks import IntervalClock
 
 
 @task(name="GetBooksIt")
@@ -44,7 +47,8 @@ def insert_books(books, source):
     assert response["StatusCode"] < 300
 
 
-with Flow("ApiBooks") as flow:
+schedule = Schedule(clocks=[IntervalClock(timedelta(hours=24))])
+with Flow("ApiBooks", schedule=schedule) as flow:
     it_books = get_books_itbooks()
     nytimes_books = get_books_nytimes()
     insert_it_books = insert_books(
@@ -53,7 +57,6 @@ with Flow("ApiBooks") as flow:
     insert_nytimes_books = insert_books(
         nytimes_books, source="nytimes-api", upstream_tasks=[nytimes_books]
     )
-
 
 flow.executor = LocalDaskExecutor()
 flow.storage = GitHub(
